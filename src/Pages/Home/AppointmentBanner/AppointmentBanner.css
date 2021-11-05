@@ -1,0 +1,4 @@
+.AppointmentBg {
+  background-color: rgba(31, 36, 37, 0.822) !important;
+  background-blend-mode: darken, luminosity;
+}
