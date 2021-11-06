@@ -5,6 +5,7 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import swal from "sweetalert";
+import useAuth from "../../Hooks/useAuth";
 
 const style = {
   textAlign: "center",
@@ -19,13 +20,15 @@ const style = {
   p: 4,
 };
 const BookingModal = ({ handleBookingClose, openBooking, booking, date }) => {
+  const { user } = useAuth();
+
   const { name, time } = booking;
   // booking form
   const handelBooking = (e) => {
     swal("Thank You!", "Information submitted", "success");
 
     e.preventDefault();
-    handleBookingClose()
+    handleBookingClose();
   };
   return (
     <div>
@@ -52,13 +55,13 @@ const BookingModal = ({ handleBookingClose, openBooking, booking, date }) => {
               <TextField
                 sx={{ width: "90%", m: 1 }}
                 id="outlined-size-small"
-                defaultValue="Your Name"
+                defaultValue={user.displayName}
                 size="small"
               />
               <TextField
                 sx={{ width: "90%", m: 1 }}
                 id="outlined-size-small"
-                defaultValue="Your Email"
+                defaultValue={user?.email}
                 size="small"
               />
               <TextField
