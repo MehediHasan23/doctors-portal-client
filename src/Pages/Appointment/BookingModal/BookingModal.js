@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import swal from "sweetalert";
 import useAuth from "../../Hooks/useAuth";
 
 const style = {
@@ -19,16 +18,49 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const BookingModal = ({ handleBookingClose, openBooking, booking, date }) => {
+const BookingModal = ({ handleBookingClose, openBooking, booking, date, setSuccessful }) => {
   const { user } = useAuth();
 
   const { name, time } = booking;
+  const initialInfo = {
+    patientName: user.displayName,
+    email: user.email,
+    phone: "",
+  };
+  const [bookingInfo, setBookingInfo] = useState(initialInfo);
+
+  const handelOnBlur = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const newBooking = { ...bookingInfo };
+    newBooking[field] = value;
+    setBookingInfo(newBooking);
+  };
   // booking form
   const handelBooking = (e) => {
-    swal("Thank You!", "Information submitted", "success");
-
     e.preventDefault();
-    handleBookingClose();
+    const appointment = {
+      ...bookingInfo,
+      serviceName: name,
+      time,
+      date: date.toLocaleDateString(),
+    };
+    fetch("http://localhost:5000/appointment", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(appointment)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.insertedId) {
+          setSuccessful(true)
+          handleBookingClose();
+        }
+      })
+
+    
   };
   return (
     <div>
@@ -56,19 +88,25 @@ const BookingModal = ({ handleBookingClose, openBooking, booking, date }) => {
                 sx={{ width: "90%", m: 1 }}
                 id="outlined-size-small"
                 defaultValue={user.displayName}
+                onBlur={handelOnBlur}
                 size="small"
+                name="patientName"
               />
               <TextField
                 sx={{ width: "90%", m: 1 }}
                 id="outlined-size-small"
                 defaultValue={user?.email}
+                onBlur={handelOnBlur}
                 size="small"
+                name="email"
               />
               <TextField
                 sx={{ width: "90%", m: 1 }}
                 id="outlined-size-small"
                 defaultValue="Phone Number"
+                onBlur={handelOnBlur}
                 size="small"
+                name="phone"
               />
               <TextField
                 disabled
